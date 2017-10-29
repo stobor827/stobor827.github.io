@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+  <HEAD>
+     <meta charset="UTF-8">
+    <script src=data.js></script>
+    <script type='text/javascript'>
+      function onload(){
+        onload2();
+      }
+      function onload2(){
+        var selMem = document.getElementById("selMen").checked;
+        var selMixed = document.getElementById("selMixed").checked;
+        var selWomen = document.getElementById("selWomen").checked;
+
+        scores.forEach( function(elem){
+          elem.scores1 = elem.scores.filter(function(elem2){
+            if( elem2.Div == "Men" && selMem){
+              return true;
+            }else if( elem2.Div == "Mixed" && selMixed){
+              return true;
+            }else if( elem2.Div == "Women" && selWomen){
+              return true;
+            }
+            return false;
+          })
+        })
+
+        var teams = new Set();
+        scores.forEach( function(elem){
+          elem.scores1.forEach( function(elem2, idx, theArray){
+            var t = elem2.Team.trim();
+            teams.add( t);
+            theArray[idx].Team = t;
+            theArray[idx].Total =  Math.round( (elem2.Rules + elem2.Fouls + elem2.Fair + elem2.Attitude + elem2.Comm)*100)/100;
+
+          })
+        })
+
+        var teamList = Array.from(teams);
+        //console.log( teamList);
+        teamList.sort();
+        var b = document.getElementById( 'teamSel');
+        while (b.hasChildNodes()) {
+            b.removeChild(b.lastChild);
+        }
+        var e =  document.createElement("option");
+        e.appendChild( document.createTextNode( "None"));
+        b.appendChild(e );
+
+        teamList.forEach( function(elem){
+          e =  document.createElement("option");
+          e.appendChild( document.createTextNode( elem));
+          b.appendChild(e );
+        })
+
+        //console.log( teamList);
+        onload1();
+      }
+      function onload1(){
+        var a =document.getElementById('asdf');
+
+        while (a.hasChildNodes()) {
+            a.removeChild(a.lastChild);
+        }
+
+
+
+        var e = document.getElementById( 'sortBy');
+        var sortBy = e.options[e.selectedIndex].text;
+        e = document.getElementById( 'teamSel');
+        var teamSort = e.options[e.selectedIndex].text;
+
+
+
+        var idxs = [];
+        scores.forEach( function(elem){
+          elem.scores1.sort( function(l,r){
+            return l[sortBy] < r[sortBy];
+          })
+          var i=0;
+          var j=-1;
+          elem.scores1.forEach( function(elem2){
+            if( elem2.Team == teamSort){
+                j=i;
+            }
+            i++;
+          })
+          idxs.push(j);
+          //console.log( elem.year,j);
+        })
+        var maxIdx = Math.max(...idxs);
+        var minIdx = Math.min(...idxs);
+        //console.log( maxIdx, minIdx);
+
+
+
+        var trs = [];
+        var nRows = 0;
+        if( document.getElementById("selMen").checked){
+          nRows += 16;
+        }
+        if( document.getElementById("selMixed").checked){
+          nRows += 16;
+        }
+        if( document.getElementById("selWomen").checked){
+          nRows += 16;
+        }
+        nRows  += maxIdx - minIdx;
+
+
+
+
+        var tr = document.createElement("tr");
+        scores.forEach( function(elem){
+          var td = document.createElement("td");
+          td.setAttribute("colspan", 2);
+          var bold = document.createElement("b");
+          var t = document.createTextNode( elem.year);
+          bold.appendChild(t);
+          td.appendChild(bold);
+          tr.appendChild(td);
+          if( elem.year != 2017){
+            var td = document.createElement("td");
+            td.setAttribute( "width", "20px")
+            td.setAttribute( "rowspan", nRows+1)
+            tr.appendChild( td );
+          }
+        })
+        a.appendChild(tr);
+
+        //console.log( nRows);
+        for( i=0;i<nRows;i++){
+          trs[i] = document.createElement("tr");
+        //  a.appendChild( trs[i]);
+        }
+        var j=0;
+        scores.forEach( function(elem){
+          var i =maxIdx - idxs[j++];
+          for( k=0;k<i;k++){
+            var tr = trs[k];
+            var td = document.createElement("td");
+            td.setAttribute( "colspan", 2);
+            var t = document.createTextNode( "");
+            td.appendChild(t);
+            tr.appendChild(td);
+            //var td = document.createElement("td");
+            //var t = document.createTextNode( "");
+            //td.appendChild(t);
+            //tr.appendChild(td);
+            //if( elem.year != 2017){
+            //  tr.appendChild( document.createElement("td"));
+            //}
+            //a.appendChild(tr);
+          }
+          elem.scores1.forEach( function(elem2){
+            //console.log( i, elem2.Team);
+            var tr = trs[i++];
+
+            var td = document.createElement("td");
+            var t = document.createTextNode( elem2.Team);
+            td.appendChild(t);
+            tr.appendChild(td);
+            var td = document.createElement("td");
+            var t = document.createTextNode( elem2[sortBy]);
+            td.appendChild(t);
+            tr.appendChild(td);
+            //if( elem.year != 2017){
+            //  tr.appendChild( document.createElement("td"));
+            //}
+            if( elem2.Team == teamSort){
+                tr.setAttribute( "style", "background-color:yellow;")
+            }
+            //a.appendChild(tr);
+          })
+          for( k=i;k<nRows;k++){
+            var tr = trs[k];
+            var td = document.createElement("td");
+            td.setAttribute( "colspan", 2);
+            var t = document.createTextNode( "");
+            td.appendChild(t);
+            tr.appendChild(td);
+            //var td = document.createElement("td");
+            //var t = document.createTextNode( "");
+            //td.appendChild(t);
+            //tr.appendChild(td);
+            //if( elem.year != 2017){
+            //  tr.appendChild( document.createElement("td"));
+            //}
+            //a.appendChild(tr);
+          }
+        //  console.log( elem);
+        })
+        trs.forEach( function(elem){
+          a.appendChild( elem);
+        })
+      }
+    </script>
+    <TITLE>Ultimate Spirit</TITLE>
+  </HEAD>
+  <BODY onload="onload()">
+    <form>
+      <table><tr><td>
+      <input type="checkbox" id="selMen" name="men" value="men" onclick="onload2()">
+      <label for="selMen">Men</label><br>
+      <input type="checkbox" id="selMixed" name="mixed" value="mixed" onclick="onload2()">
+      <label for="selMixed">Mixed</label><br>
+      <input type="checkbox" id="selWomen" name="women" value="women" onclick="onload2()">
+      <label for="selWomen">Women</label><br>
+  </td><td>
+      <select onchange="onload1()" id='sortBy'>
+        <option>Rules</option>
+        <option>Fouls</option>
+        <option>Fair</option>
+        <option>Attitude</option>
+        <option>Comm</option>
+        <option>Total</option>
+      </select>
+      <select onchange="onload1()" id='teamSel'>
+        <option>None</option>
+      </select>
+    </td></tr></table>
+    </form>
+    <Table id='asdf' border=1>
+    </table>
+  </BODY>
+</HTML>
