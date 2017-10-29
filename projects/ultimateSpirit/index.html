@@ -201,7 +201,7 @@
   <BODY onload="onload()">
     <form>
       <table><tr><td>
-      <input type="checkbox" id="selMen" name="men" value="men" onclick="onload2()">
+      <input type="checkbox" id="selMen" name="men" value="men" onclick="onload2()" checked>
       <label for="selMen">Men</label><br>
       <input type="checkbox" id="selMixed" name="mixed" value="mixed" onclick="onload2()">
       <label for="selMixed">Mixed</label><br>
@@ -214,7 +214,7 @@
         <option>Fair</option>
         <option>Attitude</option>
         <option>Comm</option>
-        <option>Total</option>
+        <option selected="selected">Total</option>
       </select>
       <select onchange="onload1()" id='teamSel'>
         <option>None</option>
